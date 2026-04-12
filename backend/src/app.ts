@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { connectDatabase } from './config/database';
+import authRouter from './modules/auth/auth.router'
 
 // Carga las variables del archivo .env
 dotenv.config();
@@ -14,6 +15,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());          // Permite peticiones desde otros orígenes (el móvil)
 app.use(express.json()); // Permite leer JSON en el body de las peticiones
 app.use(morgan('dev'));  // Muestra en consola cada petición que llega
+
+app.use('/api/auth', authRouter);
 
 // Ruta de prueba para verificar que el servidor funciona
 app.get('/health', (_req, res) => {
