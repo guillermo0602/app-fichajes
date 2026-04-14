@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { connectDatabase } from './config/database';
 import authRouter from './modules/auth/auth.router'
+import { authenticate } from './middleware/auth.middleware';
 
 // Carga las variables del archivo .env
 dotenv.config();
@@ -21,6 +22,11 @@ app.use('/api/auth', authRouter);
 // Ruta de prueba para verificar que el servidor funciona
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok', mensaje: 'Servidor funcionando correctamente' });
+});
+
+//ruta protegida de prueba
+app.get('/api/protegido', authenticate, (_req, res)=>{
+    res.json({ succes: true, mensaje: 'Accediste a una ruta protegida'});
 });
 
 async function bootstrap(){
