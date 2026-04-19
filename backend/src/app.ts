@@ -6,6 +6,8 @@ import { connectDatabase } from './config/database';
 import authRouter from './modules/auth/auth.router'
 import { authenticate } from './middleware/auth.middleware';
 
+import locationsRouter from './modules/locations/locations.router'
+
 // Carga las variables del archivo .env
 dotenv.config();
 
@@ -18,6 +20,8 @@ app.use(express.json()); // Permite leer JSON en el body de las peticiones
 app.use(morgan('dev'));  // Muestra en consola cada petición que llega
 
 app.use('/api/auth', authRouter);
+
+app.use('/api/locations', locationsRouter);
 
 // Ruta de prueba para verificar que el servidor funciona
 app.get('/health', (_req, res) => {
