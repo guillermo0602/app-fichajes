@@ -6,7 +6,9 @@ import { connectDatabase } from './config/database';
 import authRouter from './modules/auth/auth.router'
 import { authenticate } from './middleware/auth.middleware';
 
-import locationsRouter from './modules/locations/locations.router'
+import locationsRouter from './modules/locations/locations.router';
+
+import employeesRouter from './modules/employees/employees.router';
 
 // Carga las variables del archivo .env
 dotenv.config();
@@ -22,6 +24,8 @@ app.use(morgan('dev'));  // Muestra en consola cada petición que llega
 app.use('/api/auth', authRouter);
 
 app.use('/api/locations', locationsRouter);
+
+app.use('/api/employees', employeesRouter);
 
 // Ruta de prueba para verificar que el servidor funciona
 app.get('/health', (_req, res) => {

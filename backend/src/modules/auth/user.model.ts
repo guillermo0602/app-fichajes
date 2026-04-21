@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { ref } from 'node:process';
 
 // Define los dos roles posibles en la app
 export enum UserRole {
@@ -13,6 +14,7 @@ export interface IUser extends Document {
     fullName: string;
     role: UserRole;
     createdAt: Date;
+    assignedLocationId: mongoose.Types.ObjectId | null;
 }
 
 const userSchema = new Schema<IUser>(
@@ -38,6 +40,11 @@ const userSchema = new Schema<IUser>(
         enum: Object.values(UserRole),
         required: true,
         default: UserRole.EMPLOYEE,
+        },
+        assignedLocationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Location',
+        default: null,
         },
     },
     {
