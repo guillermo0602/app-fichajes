@@ -10,6 +10,7 @@ import locationsRouter from './modules/locations/locations.router';
 
 import employeesRouter from './modules/employees/employees.router';
 
+import punchesRouter from './modules/punches/punches.router';
 // Carga las variables del archivo .env
 dotenv.config();
 
@@ -26,6 +27,9 @@ app.use('/api/auth', authRouter);
 app.use('/api/locations', locationsRouter);
 
 app.use('/api/employees', employeesRouter);
+
+//ruta a los fichajes
+app.use('/api/punches', punchesRouter);
 
 // Ruta de prueba para verificar que el servidor funciona
 app.get('/health', (_req, res) => {
