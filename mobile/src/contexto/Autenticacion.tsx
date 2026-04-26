@@ -30,11 +30,10 @@ export function ProveedorAutenticacion({children}:{children : React.ReactNode}){
         setCargando(true);
         try{
             const respuesta = await iniciarSesion(email, contrasena);
+
+            console.log('Respuesta completa: ', JSON.stringify(respuesta));
+
             const { token: nuevoToken, user}= respuesta.data;
-
-            //gaurdar token en almacenamiento del movil
-            await SecureStore.setItemAsync('token', nuevoToken);
-
 
             //actualiza el estado 
             establecerToken(nuevoToken);
@@ -45,14 +44,15 @@ export function ProveedorAutenticacion({children}:{children : React.ReactNode}){
                 nombre: user.fullName,
                 rol: user.role,
             });
-        }finally{
+        }catch(error: any){
             setCargando(false);
+            throw error;
         }
+        setCargando(false);
     }
 
     //cierra sesión y elimina token
     async function logout() {
-        await SecureStore.deleteItemAsync('token');
         establecerToken(null);
         setToken(null);
         setUsuario(null);

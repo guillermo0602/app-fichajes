@@ -15,7 +15,7 @@ import punchesRouter from './modules/punches/punches.router';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // Middlewares — procesan cada petición antes de llegar a las rutas
 app.use(cors());          // Permite peticiones desde otros orígenes (el móvil)
@@ -43,7 +43,7 @@ app.get('/api/protegido', authenticate, (_req, res)=>{
 
 async function bootstrap(){
     await connectDatabase();
-    app.listen(PORT, ()=>{
+    app.listen(PORT, '0.0.0.0', ()=>{
         console.log(`Servidor corriendo en http://localhost:${PORT}`);
     });
 }

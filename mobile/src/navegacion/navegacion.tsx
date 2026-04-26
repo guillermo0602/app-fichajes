@@ -1,10 +1,13 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAutenticacion } from "../contexto/Autenticacion";
 import { NavigationContainer } from "@react-navigation/native";
+import PantallaLogin from "../pantallas/PantallaLogin";
+import PantallaAdmin from "../pantallas/PantallaAdmin";
+import PantallaFichaje from "../pantallas/PantallaFichajes";
 
 const Pila = createNativeStackNavigator();
 
-export default function navegacion(){
+export default function Navegacion(){
     const { usuario } = useAutenticacion();
 
     return(
