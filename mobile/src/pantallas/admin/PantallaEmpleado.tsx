@@ -66,6 +66,10 @@ export default function PantallaEmpleado() {
                             {item.assignedLocationId ? 'Ubicacion asignada': 'Sin ubicación'}
                         </Text>
                         <Text style={styles.accion}>Toca para asignar ubicación</Text>
+
+                        <TouchableOpacity style={styles.btnHistorial} onPress={()=> navegacion.navigate('HistorialEmpleado', {empleado: item})}>
+                            <Text style={styles.textoHistorial}>Ver Historial</Text>
+                        </TouchableOpacity>
                     </TouchableOpacity>
                 )}
                 ListEmptyComponent={
@@ -89,4 +93,6 @@ const styles = StyleSheet.create({
     cerrarSesion:{ color: '#f44336', fontSize: 14},
     cabecera:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, marginBottom: 32 },
     tarjetaAsignada: { borderLeftColor: '#aaa', opacity: 0.7},
+    btnHistorial: { marginTop: 8},
+    textoHistorial: { fontSize: 14, color: '#4CAF50', fontWeight: 'bold'},
 })

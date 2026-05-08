@@ -8,6 +8,7 @@ import PantallaEmpleado from "../pantallas/admin/PantallaEmpleado";
 import { Text } from "react-native";
 import PantallaUbicacion from "../pantallas/admin/PantallaUbicacion";
 import PantallaAsignarUbicacion from "../pantallas/admin/PantallaAsignarUbicacion";
+import PantallaHistorialEmpleado from "../pantallas/admin/PantallaHistorialEmpleado";
 
 const Pila = createNativeStackNavigator();
 const Pestanas = createBottomTabNavigator();
@@ -63,6 +64,11 @@ export default function Navegacion(){
                     name="AsignarUbicacion"
                     component={PantallaAsignarUbicacion}
                     options={{ headerShown: true, title: 'Asignar Ubicación'}}/>
+
+                <Pila.Screen
+                    name="HistorialEmpleado"
+                    component={PantallaHistorialEmpleado}
+                    options={{ headerShown: true, title: 'Historial de fichajes'}}/>
             </Pila.Navigator>
         </NavigationContainer>
     );

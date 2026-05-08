@@ -4,6 +4,44 @@ import { crearFichaje, obtenerFichajes } from '../servicios/api';
 import * as Location from 'expo-location';
 import { useAutenticacion } from '../contexto/Autenticacion';
 
+//funcion para calcular las horas trabajada entre dos fechas
+function calcularHorasTrabajadas(entrada: string, salida: string): string{
+    const diff = new Date(salida).getTime()- new Date(entrada).getTime();
+    const horas = Math.floor(diff/(1000*60*60));
+    const minutos = Math.floor((diff%(1000*60*60))/(1000*60));
+    return`${horas}h ${minutos}m`;
+}
+
+//funcion para agrupar fichajes por dia y horas
+function agruparPorDia(fichajes: any[]){
+    const grupos: { [fecha: string]: { entrada: any; salida: any}[]}={};
+
+    const ordenados = [...fichajes].sort(
+        (a,b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
+
+    //agrupacion por dia
+    ordenados.forEach((fichajes) => {
+        const fecha = new Date(fichajes.timestamp).toLocaleDateString('es-ES');
+        if(!grupos[fecha]) grupos[fecha] = [];
+
+        if(fichajes.type === 'CLOCK_IN'){
+            grupos[fecha].push({ entrada: fichajes, salida: null});
+        }else{
+            //asignar la salida al ultimo par sin salida
+            const parSinSalida = grupos[fecha].findLast((p) => !p.salida);
+
+            if(parSinSalida){
+                parSinSalida.salida = fichajes;
+            }
+        }
+    });
+
+    //convertir a un array ordenado por fecha descendente 
+    return Object.entries(grupos)
+    .map(([fecha, pares])=>({fecha, pares}))
+    .reverse();
+}
 
 export default function PantallaFichaje() {
     const {usuario, logout} = useAutenticacion();
@@ -48,7 +86,6 @@ export default function PantallaFichaje() {
 
             const { latitude, longitude } = ubicacion.coords;
 
-            console.log('Coordenada actual: ', latitude, longitude);
 
             //enviar el fichaje al backend
             await crearFichaje(tipo, latitude, longitude);
@@ -78,6 +115,8 @@ export default function PantallaFichaje() {
     }
 
     const proximoFichaje = obtenerProximoTipo();
+
+    const diasAgrupados = agruparPorDia(fichaje);
 
     return (
         <View style={styles.contenedor}>
@@ -109,25 +148,72 @@ export default function PantallaFichaje() {
             </View>
 
             {/*historial de los fichajes*/}
-            <Text style={styles.tituloHistorial}>Ultimos Fichajes</Text>
+            <Text style={styles.tituloHistorial}>Historial Fichajes</Text>
 
             {cargardoFichaje ? (
-                <ActivityIndicator/>
+                <ActivityIndicator color='#4CAF50'/>
             ):(
                 <FlatList
-                data={fichaje}
-                keyExtractor={(item) => item._id}
+                data={diasAgrupados}
+                keyExtractor={(item) => item.fecha}
                 renderItem={({item})=> (
-                    <View style={styles.itemFichaje}>
-                        <Text style={styles.tipoFichaje}>
-                            {item.type === 'CLOCK_IN' ? 'Entrada' : 'Salida'}
+                    <View style={styles.grupoDia}>
+                        {/*cabecera del dia*/}
+                        <Text style={styles.fechaDia}>
+                            {item.fecha}
                         </Text>
-                        <Text style={styles.fechaFichaje}>
-                            {new Date(item.timestamp).toLocaleString('es-ES')}
-                        </Text>
-                        <Text style={styles.distancia}>
-                            {item.distanceFromCenterMeters}m del centro
-                        </Text>
+
+                        {/*Entrada y salida del dia*/}
+                        {item.pares.map((par, index) => (
+                            <View key={index} style={styles.parFichaje}>
+                                {/*Entrada*/}
+                                <View style={styles.filaFichaje}>
+                                    <View style={[styles.indicador, {backgroundColor: '#4CAF50'}]}/>
+                                    <View>
+                                        <Text style={styles.tipoTexto}>Entrada</Text>
+                                        <Text style={styles.horaTexto}>
+                                            {new Date(par.entrada.timestamp).toLocaleDateString('es-ES', {
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                            })}
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                {/*Salida*/}
+                                {par.salida ? (
+                                    <>
+                                    <View style={styles.lineaConectora}/>
+                                    <View style={styles.filaFichaje}>
+                                        <View style={[styles.indicador, { backgroundColor: '#F44336'}]}/>
+                                        <View>
+                                            <Text style={styles.tipoTexto}>Salida</Text>
+                                            <Text style={styles.horaTexto}>
+                                                {new Date(par.salida.timestamp).toLocaleDateString('es-ES',{
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </Text>
+                                            <Text style={styles.distanciaTexto}>
+                                                {par.salida.distanceFromCenterMeters}m del centro
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    {/*horas trabajadas*/}
+                                    <View style={styles.horasTrabajadas}>
+                                        <Text style={styles.horasTexto}>
+                                            {calcularHorasTrabajadas(par.entrada.timestamp, par.salida.timestamp)} trabajadas
+                                        </Text>
+                                    </View>
+                                    </>
+                                ):(
+                                    <View style={styles.pendiente}>
+                                        <Text style={styles.pendienteTexto}>Salida pendiente</Text>
+                                    </View>
+                                )}
+                            </View>
+                        ))}
                     </View>
                 )}
                 ListEmptyComponent={
@@ -140,16 +226,25 @@ export default function PantallaFichaje() {
 
 const styles = StyleSheet.create({
     contenedor:{flex: 1, backgroundColor:'#f5f5f5', paddingTop: 50},
-    cabecera:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, marginBottom: 32 },
+    cabecera:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, marginBottom: 24 },
     titulo:{ fontSize: 20, fontWeight: 'bold', color: '#1a1a2e'},
     cerrarSesion:{ color: '#f44336', fontSize: 14},
-    contenedorBtn:{ alignItems: 'center', marginBottom: 40},
-    btnFichaje:{ width: 200, height: 200, borderRadius: 100, justifyContent: 'center', alignItems: 'center', elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2}, shadowOpacity: 0.3, shadowRadius: 4},
+    contenedorBtn:{ alignItems: 'center', marginBottom: 32},
+    btnFichaje:{ width: 180, height: 180, borderRadius: 90, justifyContent: 'center', alignItems: 'center', elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2}, shadowOpacity: 0.3, shadowRadius: 4},
     textoBtn:{ color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center'},
     tituloHistorial:{ fontSize: 18, fontWeight: 'bold', paddingHorizontal: 24, marginBottom: 12, color: '#1a1a2e'},
-    itemFichaje:{ backgroundColor: '#fff', marginHorizontal: 24, marginBottom: 8, padding: 16, borderRadius: 8, borderLeftWidth: 4, borderLeftColor: '#4CAF50'},
-    tipoFichaje:{ fontSize: 16, fontWeight: 'bold', color: '#1a1a2e'},
-    fechaFichaje:{ fontSize: 14, color: '#666', marginTop: 4},
-    distancia:{ fontSize: 12, color: '#999', marginTop: 2},
-    sinFichaje:{ textAlign: 'center', color: '#999', marginTop: 20},
-})
+    grupoDia:{ backgroundColor: '#fff', marginHorizontal: 24, marginBottom: 12, padding: 16, borderRadius: 8, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1}, shadowOpacity: 0.1, shadowRadius: 2},
+    fechaDia:{ fontSize: 15, fontWeight: 'bold', color: '#1a1a2e', marginBottom: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0', paddingBottom: 8},
+    parFichaje:{ marginBottom: 8},
+    filaFichaje:{ flexDirection: 'row', alignItems: 'flex-start', gap: 12},
+    indicador: { width: 12, height: 12, borderRadius: 6, marginTop: 4},
+    tipoTexto:{ fontSize: 15, fontWeight: 'bold', color: '#1a1a2e'},
+    horaTexto: { fontSize: 16, color: '#333', marginTop: 2},
+    distanciaTexto: { fontSize: 14, color: '#999', marginTop: 3},
+    lineaConectora:{ width: 2, height: 16, backgroundColor: '#ddd', marginLeft: 5, marginVertical: 4},
+    horasTrabajadas: { backgroundColor: '#f0f9f0', borderRadius: 6, padding: 8, marginTop: 8},
+    horasTexto: { fontSize: 14, color: '#4CAF50', fontWeight: 'bold'},
+    pendiente: { backgroundColor: '#fff9e6', borderRadius: 6, padding: 8, marginTop: 8},
+    pendienteTexto: { fontSize: 13, color: '#f0a500'},
+    sinFichaje: { textAlign: 'center', color: '#999', marginTop: 20},
+});
