@@ -5,38 +5,42 @@ import PantallaLogin from "../pantallas/PantallaLogin";
 import PantallaFichaje from "../pantallas/PantallaFichajes";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import PantallaEmpleado from "../pantallas/admin/PantallaEmpleado";
-import { Text } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import PantallaUbicacion from "../pantallas/admin/PantallaUbicacion";
 import PantallaAsignarUbicacion from "../pantallas/admin/PantallaAsignarUbicacion";
 import PantallaHistorialEmpleado from "../pantallas/admin/PantallaHistorialEmpleado";
+import PantallaCrearEmpleado from "../pantallas/admin/PantallaCrearEmpleado";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import PantallaConfiguracion from "../pantallas/PantallaConfiguracion";
 
 const Pila = createNativeStackNavigator();
 const Pestanas = createBottomTabNavigator();
 
-function NavegacionAdmin(){
+function PestanasAdmin(){
     return(
         <Pestanas.Navigator
         screenOptions={{
             headerShown: false,
-            tabBarActiveBackgroundColor: '#4CAF50',
+            tabBarActiveTintColor: '#4CAF50',
             tabBarInactiveTintColor: '#999',
         }}>
-            <Pestanas.Screen 
+            <Pestanas.Screen
             name="Empleados"
             component={PantallaEmpleado}
             options={{
                 tabBarLabel: 'Empleados',
                 tabBarIcon: ({ color }) => (
                     <Text style={{ fontSize: 20, color}}>👥</Text>
-                )
+                ),
             }}/>
+
             <Pestanas.Screen
             name="Ubicaciones"
             component={PantallaUbicacion}
             options={{
                 tabBarLabel: 'Ubicaciones',
                 tabBarIcon: ({ color }) => (
-                    <Text style={{ fontSize:20, color}}>📍</Text>
+                    <Text style={{ fontSize: 20, color}}>📍</Text>
                 ),
             }}/>
         </Pestanas.Navigator>
@@ -51,25 +55,68 @@ export default function Navegacion(){
         <NavigationContainer>
             <Pila.Navigator screenOptions={{ headerShown: false }}>
                 {!usuario ? (
-                    //si el usuario no tiene cuenta se muestra el login
-                    <Pila.Screen name="Login" component={PantallaLogin}/>
-                ): usuario.rol === 'ADMIN'? (
-                    //Pantalla para el admin
-                    <Pila.Screen name="Admin" component={NavegacionAdmin}/>
-                ):(
-                    //pantalla para los usuarios
-                    <Pila.Screen name="Fichaje" component={PantallaFichaje}/>
+                    <Pila.Screen name="Login" component={PantallaLogin} />
+                ) : usuario.rol === 'ADMIN' ? (
+                    <Pila.Screen name="Admin" component={PestanasAdmin} />
+                ) : (
+                    <Pila.Screen name="Fichaje" component={PantallaFichaje} />
                 )}
-                <Pila.Screen
+                    <Pila.Screen
                     name="AsignarUbicacion"
                     component={PantallaAsignarUbicacion}
-                    options={{ headerShown: true, title: 'Asignar Ubicación'}}/>
-
-                <Pila.Screen
+                    options={{ headerShown: true, title: 'Asignar Ubicación' }}
+                    />
+                    <Pila.Screen
                     name="HistorialEmpleado"
                     component={PantallaHistorialEmpleado}
-                    options={{ headerShown: true, title: 'Historial de fichajes'}}/>
+                    options={{ headerShown: true, title: 'Historial de fichajes' }}
+                    />
+                    <Pila.Screen
+                    name="CrearEmpleado"
+                    component={PantallaCrearEmpleado}
+                    options={{ headerShown: true, title: 'Nuevo empleado' }}
+                    />
+                    <Pila.Screen
+                    name="Configuracion"
+                    component={PantallaConfiguracion}
+                    options={{ headerShown: true, title: 'Configuración'}}
+                    />
+
             </Pila.Navigator>
         </NavigationContainer>
     );
 }
+
+const styles = StyleSheet.create({
+        drawer: { flex: 1, backgroundColor: '#fff' },
+        drawerCabecera: {
+            backgroundColor: '#1a1a2e',
+            padding: 24,
+            paddingTop: 60,
+        },
+        drawerNombre: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
+        drawerEmail: { fontSize: 13, color: '#aaa', marginTop: 4 },
+        drawerRol: {
+            fontSize: 12,
+            color: '#4CAF50',
+            marginTop: 8,
+            fontWeight: 'bold',
+        },
+        drawerOpcion: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: '#f0f0f0',
+        },
+        drawerIcono: { fontSize: 20, marginRight: 12 },
+        drawerTexto: { fontSize: 15, color: '#1a1a2e' },
+        drawerCerrarSesion: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 16,
+            position: 'absolute',
+            bottom: 32,
+        },
+        drawerTextoCerrar: { fontSize: 15, color: '#F44336' },
+})

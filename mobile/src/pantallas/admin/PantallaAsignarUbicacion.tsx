@@ -3,6 +3,8 @@ import React, { useRef, useState } from 'react';
 import { View, Text, Alert, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
 import MapView, { MapPressEvent, Marker } from 'react-native-maps';
 import { api } from '../../servicios/api';
+import { Colores } from '../../colores';
+import { Ionicons } from '@expo/vector-icons';
 
 const GOOGLE_API_KEY = 'AIzaSyBiIZzQ2voRwshISklX1Qar-Dc3VCNgIO8';
 
@@ -132,7 +134,8 @@ export default function PantallaAsignarUbicacion() {
                     style={styles.inputBuscador}
                     placeholder='Buscar dirección...'
                     value={busqueda}
-                    onChangeText={buscarSugerencia}/>
+                    onChangeText={buscarSugerencia}
+                    placeholderTextColor={Colores.textoGris}/>
                     {buscando && <ActivityIndicator style={styles.indicador} color='#4CAF50'/>}
                 </View>
 
@@ -168,14 +171,22 @@ export default function PantallaAsignarUbicacion() {
             </MapView>
 
             {/*Introduccion*/}
-            <Text style={styles.introduccion}>
-                {coordenadas?.latitude && coordenadas?.longitude
-                ? `📍 Punto seleccionado: ${coordenadas.latitude.toFixed(4)}, ${coordenadas.longitude.toFixed(4)}`
-            : 'Toca el mapa para seleccionar la ubicación'}
-            </Text>
+            <Ionicons name="location" size={18} color={Colores.primario} padding={14}>
+                <Text style={styles.introduccion}>
+                    {coordenadas?.latitude && coordenadas?.longitude
+                    ? `Punto seleccionado: ${coordenadas.latitude.toFixed(4)}, ${coordenadas.longitude.toFixed(4)}`
+                    : 'Toca el mapa para seleccionar la ubicación'}
+                </Text>
+            </Ionicons>
+
 
             {/*Input nombre*/}
-            <TextInput style={styles.input} placeholder='Nombre de la ubicación (ej: sede Central)' value={nombreUbicacion} onChangeText={setNombreUbicacion}/>
+            <TextInput 
+            style={styles.input} 
+            placeholder='Nombre de la ubicación (ej: sede Central)' 
+            value={nombreUbicacion} 
+            onChangeText={setNombreUbicacion}
+            placeholderTextColor={Colores.textoGris}/>
 
             {/*boton guardar*/}
             <TouchableOpacity 
@@ -193,22 +204,22 @@ export default function PantallaAsignarUbicacion() {
 }
 
 const styles = StyleSheet.create({
-    contenedor: { flex: 1, backgroundColor: '#f5f5f5'},
-    subtitulo: { fontSize: 16, padding: 16,paddingTop: 12, paddingBottom: 4, color: '#666'},
-    nombreEmpleado: { fontWeight: 'bold', color: '#1a1a2e'},
-    inputBuscador: { backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd', fontSize: 14, paddingHorizontal: 12},
-    contenedorBuscador: { marginHorizontal: 16, marginBottom: 4, zIndex: 10},
-    listaSugerencias: { backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd'},
-    filaSugerencias: { padding: 12},
-    textoSugerencias: { fontSize: 14, color: '#1a1a2e'},
-    mapa: { flex: 1},
-    introduccion: { textAlign: 'center', padding: 12, color: '#666', fontSize: 13},
-    input: { backgroundColor: '#fff', marginHorizontal: 16, marginBottom: 12, padding: 14, borderRadius: 8, borderWidth: 1, borderColor: '#ddd', fontSize: 15},
-    btnGuardar: { backgroundColor: '#4CAF50', marginHorizontal: 16, marginBottom: 24, padding: 16, borderRadius: 8, alignItems: 'center'},
-    btnDesactivar: {backgroundColor: '#aaa'},
-    textobtn: { color: '#fff', fontSize: 16, fontWeight: 'bold'},
-    filaBusqueda: { flexDirection: 'row', marginHorizontal: 16, marginBottom: 8, gap: 8},
-    inputBusqueda: { flex: 1, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#ddd', padding: 12, fontSize: 15},
+    contenedor: { flex: 1, backgroundColor: Colores.fondoPrincipal},
+    subtitulo: { fontSize: 16, paddingHorizontal: 16,paddingTop: 12, paddingBottom: 4, color: Colores.textoGris},
+    nombreEmpleado: { fontWeight: 'bold', color: Colores.primario},
+    inputBuscador: { flex: 1, backgroundColor: Colores.fondoTarjeta, borderRadius: 8, borderWidth: 1, borderColor: Colores.borde, fontSize: 14, padding: 12, color: Colores.textoBlanco},
+    contenedorBuscador: { marginHorizontal: 10, marginBottom: 4, zIndex: 10},
+    listaSugerencias: { backgroundColor: Colores.fondoTarjeta, borderRadius: 8, borderWidth: 1, borderColor: Colores.borde, maxHeight: 200},
+    filaSugerencias: { padding: 12, borderBottomWidth: 1, borderBottomColor: Colores.borde},
+    textoSugerencias: { fontSize: 14, color: Colores.textoBlanco},
+    mapa: { flex: 1, margin: 5},
+    introduccion: { textAlign: 'center', padding: 12, color: Colores.textoGris, fontSize: 13},
+    input: { backgroundColor: Colores.fondoTarjeta, marginHorizontal: 16, marginBottom: 12, padding: 14, borderRadius: 8, borderWidth: 1, borderColor: Colores.borde, fontSize: 15, color: Colores.textoBlanco},
+    btnGuardar: { backgroundColor: Colores.primario, marginHorizontal: 16, marginBottom: 24, padding: 16, borderRadius: 8, alignItems: 'center'},
+    btnDesactivar: {backgroundColor: Colores.borde},
+    textobtn: { color: Colores.fondoPrincipal, fontSize: 16, fontWeight: 'bold'},
+    filaBusqueda: { flexDirection: 'row', alignItems: 'center', gap: 8},
+    inputBusqueda: { flex: 1, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#ddd', padding: 10, fontSize: 15},
     btnBuscar: { backgroundColor: '#4CAF50', borderRadius: 8, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center'},
     textoBuscar: {fontSize: 18},
     indicador: { marginLeft: 8},

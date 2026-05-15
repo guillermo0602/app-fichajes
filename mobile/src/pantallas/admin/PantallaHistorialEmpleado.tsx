@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { api } from '../../servicios/api';
+import { Colores } from '../../colores';
+import { Ionicons } from '@expo/vector-icons';
 
 // Reutilizamos la misma lógica de cálculo de horas
 function calcularHorasTrabajadas(entrada: string, salida: string): string {
@@ -113,14 +115,19 @@ export default function PantallaHistorialEmpleado() {
                             </View>
                         </View>
                         <View style={estilos.horasTrabajadas}>
-                            <Text style={estilos.horasTexto}>
-                            ⏱ {calcularHorasTrabajadas(par.entrada.timestamp, par.salida.timestamp)} trabajadas
-                            </Text>
+                            <Ionicons name="time" size={15} color={Colores.primario}>
+                                <Text style={estilos.horasTexto}>
+                                    {calcularHorasTrabajadas(par.entrada.timestamp, par.salida.timestamp)} trabajadas
+                                </Text>
+                            </Ionicons>
                         </View>
                         </>
                     ) : (
                         <View style={estilos.pendiente}>
-                        <Text style={estilos.pendienteTexto}>⚠️ Salida pendiente</Text>
+                            <Ionicons name="warning" size={15} padding={8} color={Colores.advertencia}>
+                                <Text style={estilos.pendienteTexto}>Salida pendiente</Text>
+                            </Ionicons>
+                            
                         </View>
                     )}
                     </View>
@@ -137,55 +144,54 @@ export default function PantallaHistorialEmpleado() {
 }
 
 const estilos = StyleSheet.create({
-    contenedor: { flex: 1, backgroundColor: '#f5f5f5', paddingTop: 16 },
-    subtitulo: { fontSize: 15, paddingHorizontal: 24, marginBottom: 16, color: '#666' },
-    nombreEmpleado: { fontWeight: 'bold', color: '#1a1a2e' },
+    contenedor: { flex: 1, backgroundColor: Colores.fondoPrincipal, paddingTop: 16 },
+    subtitulo: { fontSize: 15, paddingHorizontal: 24, marginBottom: 16, color: Colores.textoGris },
+    nombreEmpleado: { fontWeight: 'bold', color: Colores.primario },
     grupoDia: {
-        backgroundColor: '#fff',
+        backgroundColor: Colores.fondoTarjeta,
         marginHorizontal: 24,
         marginBottom: 12,
         borderRadius: 8,
         padding: 16,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
+        borderWidth: 1,
+        borderColor: Colores.borde
     },
     fechaDia: {
         fontSize: 15,
         fontWeight: 'bold',
-        color: '#1a1a2e',
+        color: Colores.primario,
         marginBottom: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
+        borderBottomColor: Colores.borde,
         paddingBottom: 8,
     },
     parFichaje: { marginBottom: 8 },
     filaFichaje: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
     indicador: { width: 12, height: 12, borderRadius: 6, marginTop: 4 },
-    tipoTexto: { fontSize: 14, fontWeight: 'bold', color: '#1a1a2e' },
-    horaTexto: { fontSize: 16, color: '#333', marginTop: 2 },
+    tipoTexto: { fontSize: 14, fontWeight: 'bold', color: Colores.textoBlanco },
+    horaTexto: { fontSize: 16, color: Colores.textoOscuro, marginTop: 2,},
     lineaConectora: {
         width: 2,
         height: 16,
-        backgroundColor: '#ddd',
+        backgroundColor: Colores.textoBlanco,
         marginLeft: 5,
         marginVertical: 4,
     },
     horasTrabajadas: {
-        backgroundColor: '#f0f9f0',
+        backgroundColor: Colores.primarioSuave,
         borderRadius: 6,
         padding: 8,
         marginTop: 8,
     },
-    horasTexto: { fontSize: 13, color: '#4CAF50', fontWeight: 'bold' },
+    horasTexto: { fontSize: 13, color: Colores.primario, fontWeight: 'bold', },
     pendiente: {
-        backgroundColor: '#fff9e6',
+        backgroundColor: '#FFB80020',
         borderRadius: 6,
         padding: 8,
         marginTop: 8,
+        borderWidth: 1,
+        borderColor: Colores.advertencia,
     },
-    pendienteTexto: { fontSize: 13, color: '#f0a500' },
-    sinFichajes: { textAlign: 'center', color: '#999', marginTop: 20 },
+    pendienteTexto: { fontSize: 13, color: Colores.advertencia },
+    sinFichajes: { textAlign: 'center', color: Colores.textoGris, marginTop: 20 },
 });

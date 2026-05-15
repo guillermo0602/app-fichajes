@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAutenticacion } from "../contexto/Autenticacion";
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Colores } from "../colores";
 
 export default function PantallaLogin(){
     const { login, cargando } = useAutenticacion();
@@ -36,13 +37,15 @@ export default function PantallaLogin(){
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
-            autoCapitalize="none"/>
+            autoCapitalize="none"
+            placeholderTextColor={Colores.textoGris}/>
 
             <TextInput style={styles.input}
             placeholder="Contrasena"
             value={contrasena}
             onChangeText={setContrasena}
-            secureTextEntry/>
+            secureTextEntry
+            placeholderTextColor={Colores.textoGris}/>
 
             <TouchableOpacity
             style={styles.boton}
@@ -59,10 +62,10 @@ export default function PantallaLogin(){
 }
 
 const styles = StyleSheet.create({
-    container:{ flex : 1, justifyContent: 'center', padding: 24, backgroundColor: '#f5f5f5'},
-    titulo: { fontSize: 32, fontWeight: 'bold', textAlign: 'center', marginBottom: 8, color: '#1a1a2e'},
-    subtitulo: { fontSize: 16, textAlign: 'center', marginBottom: 32, color: '#666'},
-    input: { backgroundColor: '#fff', borderRadius: 8, padding: 16, marginBottom: 16, fontSize: 16, borderWidth: 1, borderColor: '#ddd'},
-    boton: { backgroundColor: '#4CAF50', borderRadius: 8, padding: 16, alignItems: 'center', marginTop: 8},
-    textoBoton: { color: '#fff', fontSize: 16, fontWeight: 'bold'},
+    container:{ flex : 1, justifyContent: 'center', padding: 24, backgroundColor: Colores.fondoPrincipal},
+    titulo: { fontSize: 36, fontWeight: 'bold', textAlign: 'center', marginBottom: 8, color: Colores.primario, letterSpacing: 2},
+    subtitulo: { fontSize: 16, textAlign: 'center', marginBottom: 32, color: Colores.textoGris},
+    input: { backgroundColor: Colores.fondoTarjeta, borderRadius: 8, padding: 16, marginBottom: 16, fontSize: 16, borderWidth: 1, borderColor: Colores.borde, color: Colores.textoBlanco},
+    boton: { backgroundColor: Colores.primario, borderRadius: 8, padding: 16, alignItems: 'center', marginTop: 8},
+    textoBoton: { color: Colores.fondoPrincipal, fontSize: 16, fontWeight: 'bold'},
 });

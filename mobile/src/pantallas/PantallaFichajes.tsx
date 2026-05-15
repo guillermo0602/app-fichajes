@@ -3,6 +3,12 @@ import { View, Text, Alert, StyleSheet, TouchableOpacity, FlatList, ActivityIndi
 import { crearFichaje, obtenerFichajes } from '../servicios/api';
 import * as Location from 'expo-location';
 import { useAutenticacion } from '../contexto/Autenticacion';
+import { Colores } from '../colores';
+import { notificarFichaje, registrarNotificaciones } from '../servicios/notificaciones';
+
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+
 
 //funcion para calcular las horas trabajada entre dos fechas
 function calcularHorasTrabajadas(entrada: string, salida: string): string{
@@ -50,9 +56,12 @@ export default function PantallaFichaje() {
     const [fichaje, setFichaje] = useState<any[]>([]);
     const [cargardoFichaje, setCargardoFichaje] = useState(true);
 
+    const navegacion = useNavigation<any>();
+
     //carga el historial de fichajes al entrar en la pantalla
     useEffect(() =>{
         cargarFichaje();
+        registrarNotificaciones();
     },[]);
 
     async function cargarFichaje() {
@@ -89,6 +98,7 @@ export default function PantallaFichaje() {
 
             //enviar el fichaje al backend
             await crearFichaje(tipo, latitude, longitude);
+            await notificarFichaje(tipo);
 
             Alert.alert('Fichaje registrado', tipo==='CLOCK_IN' ? 'Entrada registrada correctamente': 'Salida registrada correctamente');
 
@@ -123,6 +133,11 @@ export default function PantallaFichaje() {
             {/*Cabecera*/}
             <View style={styles.cabecera}>
                 <Text style={styles.titulo}>Hola, {usuario?.nombre}</Text>
+
+                <TouchableOpacity onPress={() => navegacion.navigate('Configuracion')}>
+                    <Ionicons name= "settings-outline" size={22} color={Colores.textoBlanco}/>
+                </TouchableOpacity>
+                
                 <TouchableOpacity onPress={logout}>
                     <Text style={styles.cerrarSesion}>Cerrar sesión</Text>
                 </TouchableOpacity>
@@ -130,7 +145,7 @@ export default function PantallaFichaje() {
 
             {/*Boton de fichaje*/}
             <View style={styles.contenedorBtn}>
-                <TouchableOpacity style={[styles.btnFichaje, {backgroundColor: proximoFichaje === 'CLOCK_IN' ? '#4CAF50':'#F44336'},
+                <TouchableOpacity style={[styles.btnFichaje, {backgroundColor: proximoFichaje === 'CLOCK_IN' ? Colores.primario: Colores.error },
                 ]}
                 onPress={() => manejarFichaje(proximoFichaje)}
                 disabled={cargando}
@@ -202,14 +217,17 @@ export default function PantallaFichaje() {
 
                                     {/*horas trabajadas*/}
                                     <View style={styles.horasTrabajadas}>
-                                        <Text style={styles.horasTexto}>
-                                            {calcularHorasTrabajadas(par.entrada.timestamp, par.salida.timestamp)} trabajadas
-                                        </Text>
+                                        <Ionicons name="time" size={15} color={Colores.primario}>
+                                            <Text style={styles.horasTexto}> {calcularHorasTrabajadas(par.entrada.timestamp, par.salida.timestamp)} trabajadas</Text>
+                                        </Ionicons>
                                     </View>
                                     </>
                                 ):(
                                     <View style={styles.pendiente}>
-                                        <Text style={styles.pendienteTexto}>Salida pendiente</Text>
+                                        <Ionicons name="triangle" size={15} color={Colores.advertencia}>
+                                            <Text style={styles.pendienteTexto}> Salida pendiente</Text>
+                                        </Ionicons>
+                                        
                                     </View>
                                 )}
                             </View>
@@ -225,26 +243,26 @@ export default function PantallaFichaje() {
 }
 
 const styles = StyleSheet.create({
-    contenedor:{flex: 1, backgroundColor:'#f5f5f5', paddingTop: 50},
+    contenedor:{flex: 1, backgroundColor: Colores.fondoPrincipal, paddingTop: 50},
     cabecera:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, marginBottom: 24 },
-    titulo:{ fontSize: 20, fontWeight: 'bold', color: '#1a1a2e'},
-    cerrarSesion:{ color: '#f44336', fontSize: 14},
+    titulo:{ fontSize: 20, fontWeight: 'bold', color: Colores.textoBlanco},
+    cerrarSesion:{ color: Colores.error, fontSize: 14},
     contenedorBtn:{ alignItems: 'center', marginBottom: 32},
-    btnFichaje:{ width: 180, height: 180, borderRadius: 90, justifyContent: 'center', alignItems: 'center', elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2}, shadowOpacity: 0.3, shadowRadius: 4},
-    textoBtn:{ color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center'},
-    tituloHistorial:{ fontSize: 18, fontWeight: 'bold', paddingHorizontal: 24, marginBottom: 12, color: '#1a1a2e'},
-    grupoDia:{ backgroundColor: '#fff', marginHorizontal: 24, marginBottom: 12, padding: 16, borderRadius: 8, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1}, shadowOpacity: 0.1, shadowRadius: 2},
-    fechaDia:{ fontSize: 15, fontWeight: 'bold', color: '#1a1a2e', marginBottom: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0', paddingBottom: 8},
+    btnFichaje:{ width: 180, height: 180, borderRadius: 90, justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: Colores.primario, shadowOffset: { width: 0, height: 0}, shadowOpacity: 0.8, shadowRadius: 15},
+    textoBtn:{ color: Colores.fondoPrincipal, fontSize: 18, fontWeight: 'bold', textAlign: 'center'},
+    tituloHistorial:{ fontSize: 18, fontWeight: 'bold', paddingHorizontal: 24, marginBottom: 12, color: Colores.textoBlanco},
+    grupoDia:{ backgroundColor: Colores.fondoTarjeta, marginHorizontal: 24, marginBottom: 12, padding: 16, borderRadius: 8, borderColor: Colores.borde },
+    fechaDia:{ fontSize: 15, fontWeight: 'bold', color: Colores.primario, marginBottom: 12, borderBottomWidth: 1, borderBottomColor: Colores.borde, paddingBottom: 8},
     parFichaje:{ marginBottom: 8},
     filaFichaje:{ flexDirection: 'row', alignItems: 'flex-start', gap: 12},
     indicador: { width: 12, height: 12, borderRadius: 6, marginTop: 4},
-    tipoTexto:{ fontSize: 15, fontWeight: 'bold', color: '#1a1a2e'},
-    horaTexto: { fontSize: 16, color: '#333', marginTop: 2},
-    distanciaTexto: { fontSize: 14, color: '#999', marginTop: 3},
-    lineaConectora:{ width: 2, height: 16, backgroundColor: '#ddd', marginLeft: 5, marginVertical: 4},
-    horasTrabajadas: { backgroundColor: '#f0f9f0', borderRadius: 6, padding: 8, marginTop: 8},
-    horasTexto: { fontSize: 14, color: '#4CAF50', fontWeight: 'bold'},
-    pendiente: { backgroundColor: '#fff9e6', borderRadius: 6, padding: 8, marginTop: 8},
-    pendienteTexto: { fontSize: 13, color: '#f0a500'},
-    sinFichaje: { textAlign: 'center', color: '#999', marginTop: 20},
+    tipoTexto:{ fontSize: 15, fontWeight: 'bold', color: Colores.textoBlanco },
+    horaTexto: { fontSize: 16, color: Colores.textoOscuro, marginTop: 2},
+    distanciaTexto: { fontSize: 14, color: Colores.textoGris, marginTop: 3},
+    lineaConectora:{ width: 2, height: 16, backgroundColor: Colores.borde, marginLeft: 5, marginVertical: 4},
+    horasTrabajadas: { backgroundColor: Colores.primarioSuave, borderRadius: 6, padding: 8, marginTop: 8},
+    horasTexto: { fontSize: 14, color: Colores.primario, fontWeight: 'bold'},
+    pendiente: { backgroundColor: '#FFB80020', borderRadius: 6, padding: 8, marginTop: 8,borderWidth: 1, borderColor: Colores.borde, },
+    pendienteTexto: { fontSize: 13, color: Colores.advertencia},
+    sinFichaje: { textAlign: 'center', color: Colores.textoGris, marginTop: 20},
 });
