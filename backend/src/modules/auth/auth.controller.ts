@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { login } from "./auth.service";
+import { cambiarContrasena, login } from "./auth.service";
 
 export async function loginController(req:Request, res: Response) {
     try{
@@ -30,4 +30,33 @@ export async function loginController(req:Request, res: Response) {
         });
     }
     
+}
+
+export async function cambiarContrasenaController(req: Request, res: Response) {
+    try {
+        const { contrasenaActual, contrasenaNueva } = req.body;
+
+        if(!contrasenaActual || !contrasenaNueva){
+            res.status(400).json({
+                success: false,
+                mensaje: 'La contraseña actual y la nueva contraseña son oblogatorios',
+            });
+            return;
+        }
+
+        //El userId viene del token JWT
+        const userId = req.authenticatedUser!.userId;
+
+        await cambiarContrasena(userId, contrasenaActual, contrasenaNueva);
+
+        res.status(200).json({
+            success: true,
+            mensaje: 'Contraseña actuañizada correctamente',
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            success: false,
+            mensaje: error.message,
+        });
+    }
 }

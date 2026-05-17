@@ -51,7 +51,7 @@ export async function registrarNotificaciones(): Promise<string | null> {
 }
 
 //Recordatorio de fichaje de entrada 
-export async function recordatorioEntrada(hora: number, minutos: number) {
+export async function programaRecordatorioEntrada(hora: number, minutos: number) {
     //cancelar recordatorios anteriores para evitar duplicados 
     await cancelarRecordatorio();
 
@@ -70,7 +70,7 @@ export async function recordatorioEntrada(hora: number, minutos: number) {
 }
 
 //Recordatorio fichaje de salida
-export async function recordatorioSalida(hora: number, minutos: number) {
+export async function programaRecordatorioSalida(hora: number, minutos: number) {
     await Notifications.scheduleNotificationAsync({
         content:{
             title: 'Recuerda fichar tu salida',

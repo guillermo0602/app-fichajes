@@ -39,3 +39,28 @@ export async function login(email:string, password: string) {
         },
     };
 }
+
+//funcion para cambiar la contraseña
+export async function cambiarContrasena( userId: string, contrasenaActual: string, contrasenaNueva: string) {
+
+    //buscar el usuario
+    const user = await UserModel.findById(userId);
+    if(!user){
+        throw new Error('Usuario no encontrado');
+    }
+
+    //Verificar la contraseña actual
+    const contrasenaCorrecta = await bcrypt.compare(contrasenaActual, user.passwordHash);
+    if(!contrasenaCorrecta){
+        throw new Error('La contraseña actual no es correcta');
+    }
+
+    //validar nueva contraseña
+    if(contrasenaNueva.length<8){
+        throw new Error('La nueva contraseña debe tener minimo 8 caracteres');
+    }
+
+    //encriptar la nueva contraseña y guardarla
+    const nuevoHash = await bcrypt.hash(contrasenaNueva, 12);
+    await UserModel.findByIdAndUpdate(userId, {passwordHash: nuevoHash});
+}

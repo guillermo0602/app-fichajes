@@ -5,13 +5,15 @@ import PantallaLogin from "../pantallas/PantallaLogin";
 import PantallaFichaje from "../pantallas/PantallaFichajes";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import PantallaEmpleado from "../pantallas/admin/PantallaEmpleado";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet } from "react-native";
 import PantallaUbicacion from "../pantallas/admin/PantallaUbicacion";
 import PantallaAsignarUbicacion from "../pantallas/admin/PantallaAsignarUbicacion";
 import PantallaHistorialEmpleado from "../pantallas/admin/PantallaHistorialEmpleado";
 import PantallaCrearEmpleado from "../pantallas/admin/PantallaCrearEmpleado";
-import { createDrawerNavigator } from "@react-navigation/drawer";
 import PantallaConfiguracion from "../pantallas/PantallaConfiguracion";
+import { Colores } from "../colores";
+import { Ionicons } from "@expo/vector-icons";
+import PantallaPerfil from "../pantallas/PantallaPerfil";
 
 const Pila = createNativeStackNavigator();
 const Pestanas = createBottomTabNavigator();
@@ -21,8 +23,8 @@ function PestanasAdmin(){
         <Pestanas.Navigator
         screenOptions={{
             headerShown: false,
-            tabBarActiveTintColor: '#4CAF50',
-            tabBarInactiveTintColor: '#999',
+            tabBarActiveTintColor: Colores.primario,
+            tabBarInactiveTintColor: Colores.textoGris,
         }}>
             <Pestanas.Screen
             name="Empleados"
@@ -30,7 +32,7 @@ function PestanasAdmin(){
             options={{
                 tabBarLabel: 'Empleados',
                 tabBarIcon: ({ color }) => (
-                    <Text style={{ fontSize: 20, color}}>👥</Text>
+                    <Ionicons name="people-outline" size={24} color={color}/>
                 ),
             }}/>
 
@@ -40,10 +42,48 @@ function PestanasAdmin(){
             options={{
                 tabBarLabel: 'Ubicaciones',
                 tabBarIcon: ({ color }) => (
-                    <Text style={{ fontSize: 20, color}}>📍</Text>
+                    <Ionicons name ="location-outline" size={24} color={color}/>
                 ),
             }}/>
         </Pestanas.Navigator>
+    );
+}
+
+const PestanasEmpleado = createBottomTabNavigator();
+
+//funcion para que el empleado pueda navegar entre funciones
+function NavegacionEmpleado(){
+    return(
+        <PestanasEmpleado.Navigator
+        screenOptions={{
+            headerShown: false,
+            tabBarActiveTintColor: Colores.primario,
+            tabBarInactiveTintColor: Colores.textoGris,
+            tabBarStyle:{
+                backgroundColor: Colores.fondoCabecera,
+                borderTopColor: Colores.borde,
+            },
+        }}>
+            <PestanasEmpleado.Screen
+            name="Fichaje"
+            component={PantallaFichaje}
+            options={{
+                tabBarLabel:'Fichaje',
+                tabBarIcon: ({ color }) => (
+                    <Ionicons name="finger-print-outline" size={24} color={color}/>
+                ),
+            }}/>
+
+            <PestanasEmpleado.Screen
+            name="Perfil"
+            component={PantallaPerfil}
+            options={{
+                tabBarLabel: 'Pefil',
+                tabBarIcon: ({ color }) => (
+                    <Ionicons name="person-outline" size={24} color={color}/>
+                ),
+            }}/>
+        </PestanasEmpleado.Navigator>
     );
 }
 
@@ -59,7 +99,9 @@ export default function Navegacion(){
                 ) : usuario.rol === 'ADMIN' ? (
                     <Pila.Screen name="Admin" component={PestanasAdmin} />
                 ) : (
-                    <Pila.Screen name="Fichaje" component={PantallaFichaje} />
+                    <Pila.Screen
+                    name="Empleado"
+                    component={NavegacionEmpleado}/>
                 )}
                     <Pila.Screen
                     name="AsignarUbicacion"
@@ -81,42 +123,7 @@ export default function Navegacion(){
                     component={PantallaConfiguracion}
                     options={{ headerShown: true, title: 'Configuración'}}
                     />
-
             </Pila.Navigator>
         </NavigationContainer>
     );
 }
-
-const styles = StyleSheet.create({
-        drawer: { flex: 1, backgroundColor: '#fff' },
-        drawerCabecera: {
-            backgroundColor: '#1a1a2e',
-            padding: 24,
-            paddingTop: 60,
-        },
-        drawerNombre: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
-        drawerEmail: { fontSize: 13, color: '#aaa', marginTop: 4 },
-        drawerRol: {
-            fontSize: 12,
-            color: '#4CAF50',
-            marginTop: 8,
-            fontWeight: 'bold',
-        },
-        drawerOpcion: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 16,
-            borderBottomWidth: 1,
-            borderBottomColor: '#f0f0f0',
-        },
-        drawerIcono: { fontSize: 20, marginRight: 12 },
-        drawerTexto: { fontSize: 15, color: '#1a1a2e' },
-        drawerCerrarSesion: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 16,
-            position: 'absolute',
-            bottom: 32,
-        },
-        drawerTextoCerrar: { fontSize: 15, color: '#F44336' },
-})
