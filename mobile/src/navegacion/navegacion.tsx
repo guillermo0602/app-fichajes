@@ -14,6 +14,7 @@ import PantallaConfiguracion from "../pantallas/PantallaConfiguracion";
 import { Colores } from "../colores";
 import { Ionicons } from "@expo/vector-icons";
 import PantallaPerfil from "../pantallas/PantallaPerfil";
+import PantallaInforme from "../pantallas/admin/PantallaInforme";
 
 const Pila = createNativeStackNavigator();
 const Pestanas = createBottomTabNavigator();
@@ -122,6 +123,12 @@ export default function Navegacion(){
                     name="Configuracion"
                     component={PantallaConfiguracion}
                     options={{ headerShown: true, title: 'Configuración'}}
+                    />
+
+                    <Pila.Screen
+                    name="Informe"
+                    component={PantallaInforme}
+                    options={{ headerShown: true, title: 'Informe mensual'}}
                     />
             </Pila.Navigator>
         </NavigationContainer>

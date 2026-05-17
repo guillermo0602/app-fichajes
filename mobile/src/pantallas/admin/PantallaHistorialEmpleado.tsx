@@ -5,8 +5,9 @@ import {
     FlatList,
     StyleSheet,
     ActivityIndicator,
+    TouchableOpacity,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { api } from '../../servicios/api';
 import { Colores } from '../../colores';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,10 +32,10 @@ function agruparPorDia(fichajes: any[]) {
         if (!grupos[fecha]) grupos[fecha] = [];
 
         if (fichaje.type === 'CLOCK_IN') {
-        grupos[fecha].push({ entrada: fichaje, salida: null });
+            grupos[fecha].push({ entrada: fichaje, salida: null });
         } else {
-        const parSinSalida = grupos[fecha].findLast((p) => !p.salida);
-        if (parSinSalida) parSinSalida.salida = fichaje;
+            const parSinSalida = grupos[fecha].findLast((p) => !p.salida);
+            if (parSinSalida) parSinSalida.salida = fichaje;
         }
     });
 
@@ -56,23 +57,30 @@ export default function PantallaHistorialEmpleado() {
 
     async function cargarFichajes() {
         try {
-        setCargando(true);
-        const respuesta = await api.get(`/punches/${empleado._id}`);
-        setFichajes(respuesta.data.data);
+            setCargando(true);
+            const respuesta = await api.get(`/punches/${empleado._id}`);
+            setFichajes(respuesta.data.data);
         } catch (error) {
-        console.log('Error cargando fichajes:', error);
+            console.log('Error cargando fichajes:', error);
         } finally {
-        setCargando(false);
+            setCargando(false);
         }
     }
 
     const diasAgrupados = agruparPorDia(fichajes);
 
+    const navegacion = useNavigation<any>();
+
     return (
-        <View style={estilos.contenedor}>
-        <Text style={estilos.subtitulo}>
-            Empleado: <Text style={estilos.nombreEmpleado}>{empleado.fullName}</Text>
+        <View style={styles.contenedor}>
+        <Text style={styles.subtitulo}>
+            Empleado: <Text style={styles.nombreEmpleado}>{empleado.fullName}</Text>
         </Text>
+
+        <TouchableOpacity style={styles.btnInforme} onPress={() => navegacion.navigate('Informe', { empleado }) }>
+            <Ionicons name="bar-chart-outline" size={16} color={Colores.fondoPrincipal}/>
+            <Text style={styles.textoBtnInforme}>Ver informe mensual</Text>
+        </TouchableOpacity>
 
         {cargando ? (
             <ActivityIndicator size="large" color="#4CAF50" />
@@ -81,16 +89,16 @@ export default function PantallaHistorialEmpleado() {
             data={diasAgrupados}
             keyExtractor={(item) => item.fecha}
             renderItem={({ item }) => (
-                <View style={estilos.grupoDia}>
-                <Text style={estilos.fechaDia}>{item.fecha}</Text>
+                <View style={styles.grupoDia}>
+                <Text style={styles.fechaDia}>{item.fecha}</Text>
 
                 {item.pares.map((par, index) => (
-                    <View key={index} style={estilos.parFichaje}>
-                    <View style={estilos.filaFichaje}>
-                        <View style={[estilos.indicador, { backgroundColor: '#4CAF50' }]} />
+                    <View key={index} style={styles.parFichaje}>
+                    <View style={styles.filaFichaje}>
+                        <View style={[styles.indicador, { backgroundColor: '#4CAF50' }]} />
                         <View>
-                        <Text style={estilos.tipoTexto}>Entrada</Text>
-                        <Text style={estilos.horaTexto}>
+                        <Text style={styles.tipoTexto}>Entrada</Text>
+                        <Text style={styles.horaTexto}>
                             {new Date(par.entrada.timestamp).toLocaleTimeString('es-ES', {
                             hour: '2-digit',
                             minute: '2-digit',
@@ -101,12 +109,12 @@ export default function PantallaHistorialEmpleado() {
 
                     {par.salida ? (
                         <>
-                        <View style={estilos.lineaConectora} />
-                        <View style={estilos.filaFichaje}>
-                            <View style={[estilos.indicador, { backgroundColor: '#F44336' }]} />
+                        <View style={styles.lineaConectora} />
+                        <View style={styles.filaFichaje}>
+                            <View style={[styles.indicador, { backgroundColor: '#F44336' }]} />
                             <View>
-                            <Text style={estilos.tipoTexto}>Salida</Text>
-                            <Text style={estilos.horaTexto}>
+                            <Text style={styles.tipoTexto}>Salida</Text>
+                            <Text style={styles.horaTexto}>
                                 {new Date(par.salida.timestamp).toLocaleTimeString('es-ES', {
                                 hour: '2-digit',
                                 minute: '2-digit',
@@ -114,18 +122,18 @@ export default function PantallaHistorialEmpleado() {
                             </Text>
                             </View>
                         </View>
-                        <View style={estilos.horasTrabajadas}>
+                        <View style={styles.horasTrabajadas}>
                             <Ionicons name="time" size={15} color={Colores.primario}>
-                                <Text style={estilos.horasTexto}>
+                                <Text style={styles.horasTexto}>
                                     {calcularHorasTrabajadas(par.entrada.timestamp, par.salida.timestamp)} trabajadas
                                 </Text>
                             </Ionicons>
                         </View>
                         </>
                     ) : (
-                        <View style={estilos.pendiente}>
+                        <View style={styles.pendiente}>
                             <Ionicons name="warning" size={15} padding={8} color={Colores.advertencia}>
-                                <Text style={estilos.pendienteTexto}>Salida pendiente</Text>
+                                <Text style={styles.pendienteTexto}>Salida pendiente</Text>
                             </Ionicons>
                             
                         </View>
@@ -135,7 +143,7 @@ export default function PantallaHistorialEmpleado() {
                 </View>
             )}
             ListEmptyComponent={
-                <Text style={estilos.sinFichajes}>No hay fichajes registrados</Text>
+                <Text style={styles.sinFichajes}>No hay fichajes registrados</Text>
             }
             />
         )}
@@ -143,7 +151,7 @@ export default function PantallaHistorialEmpleado() {
     );
 }
 
-const estilos = StyleSheet.create({
+const styles = StyleSheet.create({
     contenedor: { flex: 1, backgroundColor: Colores.fondoPrincipal, paddingTop: 16 },
     subtitulo: { fontSize: 15, paddingHorizontal: 24, marginBottom: 16, color: Colores.textoGris },
     nombreEmpleado: { fontWeight: 'bold', color: Colores.primario },
@@ -194,4 +202,6 @@ const estilos = StyleSheet.create({
     },
     pendienteTexto: { fontSize: 13, color: Colores.advertencia },
     sinFichajes: { textAlign: 'center', color: Colores.textoGris, marginTop: 20 },
+    btnInforme: { backgroundColor: Colores.primario, marginHorizontal: 24, marginBottom: 16, padding: 12, borderRadius: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8},
+    textoBtnInforme: { color: Colores.fondoPrincipal, fontWeight: 'bold', fontSize: 14},
 });
